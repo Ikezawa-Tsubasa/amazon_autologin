@@ -45,7 +45,23 @@ var targets = function (list) {
     targetsString += `&i=${value}|search-alias%3D${value}|`
   }
   return targetsString.slice(0, -1);
+
 }
+
+function a (tab) {
+    targetURL = tab.url;
+    if (toggle &&
+      targetURL.match("amazon.co.jp/s/|amazon.co.jp/s?") &&
+      targetURL.match(targets(whitelist)) &&
+      !targetURL.match("&k=&|.*&field-keywords=$")
+    ) {
+      return {
+        redirectUrl: targetURL + sellerFilter
+      };
+    }
+    return {};
+  }
+
 
 chrome.browserAction.onClicked.addListener(function (tab) {
   toggle = !toggle;
@@ -59,23 +75,11 @@ chrome.browserAction.onClicked.addListener(function (tab) {
       path: "icons/off2.png"
     });
   }
+  chrome.tabs.reload(0)
 
-  chrome.tabs.reload (tabs[0].id)
 });
 
-chrome.webRequest.onBeforeRequest.addListener(function (tab) {
-    targetURL = tab.url;
-    if (toggle &&
-      targetURL.match("amazon.co.jp/s/|amazon.co.jp/s?") &&
-      targetURL.match(targets(whitelist)) &&
-      !targetURL.match("&k=&|.*&field-keywords=$")
-    ) {
-      return {
-        redirectUrl: targetURL + sellerFilter
-      };
-    }
-    return {};
-  }, {
+chrome.webRequest.onBeforeRequest.addListener(a, {
     urls: ["*://www.amazon.co.jp/s*"],
     types: ["main_frame"]
   },
