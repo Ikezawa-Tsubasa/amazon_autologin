@@ -75,7 +75,12 @@ chrome.browserAction.onClicked.addListener(function (tab) {
       path: "icons/off2.png"
     });
   }
-  chrome.tabs.reload(0)
+  chrome.tabs.reload();
+  GEvent.addListener(a, {
+    urls: ["*://www.amazon.co.jp/s*"],
+    types: ["main_frame"]
+  },
+  ["blocking"]);
 
 });
 
